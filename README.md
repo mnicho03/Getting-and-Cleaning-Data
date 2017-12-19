@@ -11,3 +11,6 @@ Getting and Cleaning Data Course Project
 
 # CodeBook.md
 describes the variables, the data, and any transformations or work that you performed to clean up the data
+
+# Assumptions
+1) data is already downloaded into UCI HAR Dataset folder one level below working directory
