@@ -56,24 +56,22 @@ DataTable <- mergedX
 setwd("../")
 featureData <- tbl_df(read.table("features.txt"))
 colnames(featureData) <- c("feature_number", "feature_name")
-# update column names of main data table
 colnames(DataTable) <- featureData$feature_name
-
 # 
 # # import and name activity label variables
 activityLabels <- tbl_df(read.table("activity_labels.txt"))
 colnames(activityLabels) <- c("activity_number", "activity_name")
 
 # # merge columns
-allActivity_Subject <- cbind(allActivityData, mergedSubject)
+allActivity_Subject <- cbind(allActivityData, allSubjectData)
 DataTable <- cbind(allActivity_Subject, DataTable)
 
 #--------------------------------------------------------------------
 
 # # 2) Extracts only the measurements on the mean and standard deviation for each measurement.
-# # get list of features of means / std
-MeanSTDIndexes <- grep("mean\\()|std\\()", featureData$feature_name)
-MeanSTDFeatures <- featureData[MeanSTDIndexes,]
+# get list of features of means / std
+MeanSTDIndex <- grep("mean\\()|std\\()", colnames(DataTable))
+DataTable <- DataTable[MeanSTDIndex,]
 
 #--------------------------------------------------------------------
 
