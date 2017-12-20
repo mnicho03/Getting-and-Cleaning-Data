@@ -56,6 +56,9 @@ DataTable <- mergedX
 setwd("../")
 featureData <- tbl_df(read.table("features.txt"))
 colnames(featureData) <- c("feature_number", "feature_name")
+# update column names of main data table
+colnames(DataTable) <- featureData$feature_name
+
 # 
 # # import and name activity label variables
 activityLabels <- tbl_df(read.table("activity_labels.txt"))
