@@ -14,3 +14,6 @@ describes the variables, the data, and any transformations or work that you perf
 
 # Tidy_Secondary.txt
 Tidy data set - resulting txt file from the write.table function in the final line of the run_analysis.R script.
+
+# Tidy_Averages.txt
+Revised tidy data set based on step 5 which takes the average of each variable
