@@ -11,3 +11,6 @@ Getting and Cleaning Data Course Project
 
 # CodeBook.md
 describes the variables, the data, and any transformations or work that you performed to clean up the data
+
+# Tidy_Secondary.txt
+Tidy data set - resulting txt file from the write.table function in the final line of the run_analysis.R script.
