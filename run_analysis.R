@@ -102,5 +102,7 @@ colnames(DataTable) <- DataTableColNames
 
 #--------------------------------------------------------------------
 
-# # 5) From the data set in step 4, creates a second, independent tidy data set with the average
-write.table(DataTable, "Tidy_Secondary.txt", row.names = FALSE)
+# # 5) From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+DataTableMean <- summarise_all(DataTable, mean)
+write.table(DataTableMean, "Tidy_Averages.txt", row.names = FALSE)
+
