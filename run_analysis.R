@@ -28,70 +28,79 @@ library(tidyr)
 # # Train
 setwd("train")
 subject_train <- read.table("subject_train.txt")
-x_train <- read.table("x_train.txt")
-y_train <- read.table("y_train.txt")
+values_train <- read.table("x_train.txt")
+activity_train <- read.table("y_train.txt")
 # 
 # # Test
 setwd("../test")
 subject_test <- read.table("subject_test.txt")
-x_test <- read.table("x_test.txt")
-y_test <- read.table("y_test.txt")
-# 
-# # Merges the training and the test sets to create one data set.
-mergedSubject <- rbind(subject_test, subject_train)
-mergedSubject <- tbl_df(mergedSubject)
-mergedX <- rbind(x_test, x_train)
-mergedX <- tbl_df(mergedX)
-mergedY <- rbind(y_test, y_train)
-mergedY <- tbl_df(mergedY)
-# 
-# # Creates clear names for all fields
-allSubjectData <- mergedSubject
-colnames(allSubjectData) <- "subject"
-allActivityData <- mergedY
-colnames(allActivityData) <- "activity_number"
-DataTable <- mergedX
-# 
-# # import and name feature variables
+values_test <- read.table("x_test.txt")
+activity_test <- read.table("y_test.txt")
+
+# # import  feature variables
 setwd("../")
-featureData <- tbl_df(read.table("features.txt"))
-colnames(featureData) <- c("feature_number", "feature_name")
-colnames(DataTable) <- featureData$feature_name
-# 
+featureData <- read.table("features.txt")
+
+
 # # import and name activity label variables
-activityLabels <- tbl_df(read.table("activity_labels.txt"))
+activityLabels <- read.table("activity_labels.txt")
 colnames(activityLabels) <- c("activity_number", "activity_name")
 
-# # merge columns
-allActivity_Subject <- cbind(allActivityData, allSubjectData)
-DataTable <- cbind(allActivity_Subject, DataTable)
+# 
+# # Merges the training and the test sets to create one data set.
 
+DataTable <- rbind(
+  cbind(subject_train, values_train, activity_train),
+  cbind(subject_test, values_test, activity_test)
+)
+
+# assign column names
+# create colname variable based on feature activity names
+colVar <- featureData[,2]
+# set as character 
+featureColNames <- as.character(colVar)
+#concat subject - feature activity names - activity
+colnames(DataTable) <- c("subject", featureColNames, "activity")
 #--------------------------------------------------------------------
 
 # # 2) Extracts only the measurements on the mean and standard deviation for each measurement.
-# get list of features of means / std
-MeanSTDIndex <- grep("mean\\()|std\\()", colnames(DataTable))
-DataTable <- DataTable[MeanSTDIndex,]
+
+# determine which columns contain mean / std information
+MeanSTDColumns <- grepl("subject|activity|mean|std", colnames(DataTable))
+
+# filter based on those columns
+DataTable <- DataTable[, MeanSTDColumns]
 
 #--------------------------------------------------------------------
 
 # # 3) Uses descriptive activity names to name the activities in the data set
-DataTable <- merge(activityLabels, DataTable , by="activity_number", all.x=TRUE)
-DataTable$activity_name <- as.character(DataTable$activity_name)
+
+# replace activity values with named factor levels
+DataTable$activity <- factor(DataTable$activity, 
+                             levels = activityLabels[, 1], labels = activityLabels[, 2])
 
 #--------------------------------------------------------------------
 
 # # 4) Appropriately labels the data set with descriptive variable names.
-names(DataTable)<-gsub("std()", "SD", names(DataTable))
-names(DataTable)<-gsub("mean()", "MEAN", names(DataTable))
-names(DataTable)<-gsub("^t", "time", names(DataTable))
-names(DataTable)<-gsub("^f", "frequency", names(DataTable))
-names(DataTable)<-gsub("Acc", "Accelerometer", names(DataTable))
-names(DataTable)<-gsub("Gyro", "Gyroscope", names(DataTable))
-names(DataTable)<-gsub("Mag", "Magnitude", names(DataTable))
-names(DataTable)<-gsub("BodyBody", "Body", names(DataTable))
+
+DataTableColNames <- colnames(DataTable)
+
+# remove special characters
+DataTableColNames <- gsub("[\\(\\)-]", "", DataTableColNames)
+
+DataTableColNames<-gsub("std()", "SD", names(DataTable))
+DataTableColNames<-gsub("mean()", "MEAN", names(DataTable))
+DataTableColNames<-gsub("^t", "time", names(DataTable))
+DataTableColNames<-gsub("^f", "frequency", names(DataTable))
+DataTableColNames<-gsub("Acc", "Accelerometer", names(DataTable))
+DataTableColNames<-gsub("Gyro", "Gyroscope", names(DataTable))
+DataTableColNames<-gsub("Mag", "Magnitude", names(DataTable))
+DataTableColNames<-gsub("BodyBody", "Body", names(DataTable))
+
+#reset column names
+colnames(DataTable) <- DataTableColNames
 
 #--------------------------------------------------------------------
 
 # # 5) From the data set in step 4, creates a second, independent tidy data set with the average
-write.table(DataTable, "Tidy_Secondary.txt")
+write.table(DataTable, "Tidy_Secondary.txt", row.name = FALSE)
